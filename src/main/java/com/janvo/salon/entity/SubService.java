@@ -59,6 +59,7 @@ public class SubService {
     private Integer displayOrder;
 
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean active = true;
 
     @CreationTimestamp

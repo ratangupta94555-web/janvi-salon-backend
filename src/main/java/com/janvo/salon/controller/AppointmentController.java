@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.janvo.salon.dtos.AppointmentResponse;
 import com.janvo.salon.dtos.CreateAppointmentRequest;
+import com.janvo.salon.dtos.SalonLocationResponse;
 import com.janvo.salon.enums.AppointmentStatus;
+import com.janvo.salon.enums.SalonLocationId;
 import com.janvo.salon.service.AppointmentService;
 
 import jakarta.validation.Valid;
@@ -35,6 +38,18 @@ public class AppointmentController {
 	public ResponseEntity<AppointmentResponse> create(@Valid @RequestBody CreateAppointmentRequest request) {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(request));
+	}
+
+	@GetMapping("/locations")
+	public ResponseEntity<List<SalonLocationResponse>> getLocations() {
+		return ResponseEntity.ok(appointmentService.getLocations());
+	}
+
+	@GetMapping("/availability")
+	public ResponseEntity<List<AppointmentResponse>> getAvailability(
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+			@RequestParam SalonLocationId locationId) {
+		return ResponseEntity.ok(appointmentService.getAvailability(date, locationId));
 	}
 
 	@GetMapping("/{id}")

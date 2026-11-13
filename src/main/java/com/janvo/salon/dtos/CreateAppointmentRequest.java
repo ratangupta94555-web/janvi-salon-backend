@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.janvo.salon.enums.SalonLocationId;
+
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,6 +31,8 @@ public class CreateAppointmentRequest {
 
     @NotEmpty
     private List<Long> subServiceIds;
+
+    private SalonLocationId locationId;
 
     @NotNull
     @FutureOrPresent

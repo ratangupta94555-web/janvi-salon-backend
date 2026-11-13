@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.janvo.salon.enums.AppointmentStatus;
 import com.janvo.salon.enums.PaymentStatus;
+import com.janvo.salon.enums.SalonLocationId;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +49,10 @@ public class Appointment {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "location_id", length = 32)
+	private SalonLocationId locationId;
 
 	@Column(name = "appointment_date", nullable = false)
 	private LocalDate appointmentDate;

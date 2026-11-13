@@ -47,6 +47,7 @@ public class SalonService {
     private Integer displayOrder;
 
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(

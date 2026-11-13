@@ -25,6 +25,10 @@ public class AppointmentResponse {
 
 	private String phone;
 
+	private String locationId;
+
+	private String locationName;
+
 	private LocalDate appointmentDate;
 
 	private LocalTime startTime;

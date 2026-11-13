@@ -11,12 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.janvo.salon.dtos.AppointmentItemResponse;
 import com.janvo.salon.dtos.AppointmentResponse;
 import com.janvo.salon.dtos.CreateAppointmentRequest;
+import com.janvo.salon.dtos.SalonLocationResponse;
 import com.janvo.salon.entity.Appointment;
 import com.janvo.salon.entity.AppointmentItem;
 import com.janvo.salon.entity.Customer;
 import com.janvo.salon.entity.SubService;
 import com.janvo.salon.enums.AppointmentStatus;
 import com.janvo.salon.enums.PaymentStatus;
+import com.janvo.salon.enums.SalonLocationId;
 import com.janvo.salon.exceptions.ResourceNotFoundException;
 import com.janvo.salon.exceptions.SlotNotAvailableException;
 import com.janvo.salon.repository.AppointmentRepository;
@@ -62,10 +64,20 @@ public class AppointmentServiceImpl implements AppointmentService {
 		int totalDuration = subServices.stream().mapToInt(SubService::getDurationMinutes).sum();
 
 		LocalTime startTime = request.getPreferredStartTime();
+		int startMinutes = startTime.getHour() * 60 + startTime.getMinute();
+		int endMinutes = startMinutes + totalDuration;
+		SalonLocationId locationId = request.getLocationId() == null
+				? SalonLocationId.CHITAIPUR
+				: request.getLocationId();
+
+		if (startMinutes < 9 * 60 || startMinutes >= 23 * 60 || endMinutes > 23 * 60
+				|| startTime.getMinute() % 30 != 0) {
+			throw new IllegalArgumentException("Choose a valid 30-minute start time between 9:00 AM and 10:30 PM");
+		}
 		LocalTime endTime = startTime.plusMinutes(totalDuration);
 
 		boolean alreadyBooked = appointmentRepository.existsOverlappingAppointment(request.getAppointmentDate(),
-				startTime, endTime,
+				locationId, startTime, endTime,
 				List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS));
 
 		if (alreadyBooked) {
@@ -78,7 +90,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 		BigDecimal discount = subtotal.subtract(total);
 
-		Appointment appointment = Appointment.builder().customer(customer).appointmentDate(request.getAppointmentDate())
+		Appointment appointment = Appointment.builder().customer(customer).locationId(locationId)
+				.appointmentDate(request.getAppointmentDate())
 				.startTime(startTime).endTime(endTime).totalDurationMinutes(totalDuration).subtotal(subtotal)
 				.discount(discount).totalAmount(total).status(AppointmentStatus.PENDING)
 				.paymentStatus(PaymentStatus.UNPAID).notes(request.getNotes()).build();
@@ -130,6 +143,22 @@ public class AppointmentServiceImpl implements AppointmentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<SalonLocationResponse> getLocations() {
+		return java.util.Arrays.stream(SalonLocationId.values())
+				.map(location -> SalonLocationResponse.builder().locationId(location.name())
+						.name(location.getName()).address(location.getAddress()).build())
+				.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<AppointmentResponse> getAvailability(LocalDate date, SalonLocationId locationId) {
+		return appointmentRepository.findAvailabilityByLocationAndDate(locationId, date).stream()
+				.map(this::mapToResponse).toList();
+	}
+
+	@Override
 	public void cancel(Long id) {
 
 		Appointment appointment = appointmentRepository.findById(id)
@@ -178,7 +207,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 		return AppointmentResponse.builder().id(appointment.getId()).customerId(appointment.getCustomer().getId())
 				.customerName(appointment.getCustomer().getFirstName() + " " + appointment.getCustomer().getLastName())
-				.phone(appointment.getCustomer().getPhone()).appointmentDate(appointment.getAppointmentDate())
+				.phone(appointment.getCustomer().getPhone())
+				.locationId(appointment.getLocationId() == null ? null : appointment.getLocationId().name())
+				.locationName(appointment.getLocationId() == null ? null : appointment.getLocationId().getName())
+				.appointmentDate(appointment.getAppointmentDate())
 				.startTime(appointment.getStartTime()).endTime(appointment.getEndTime())
 				.totalDurationMinutes(appointment.getTotalDurationMinutes()).subtotal(appointment.getSubtotal())
 				.discount(appointment.getDiscount()).totalAmount(appointment.getTotalAmount())

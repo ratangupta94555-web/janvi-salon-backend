@@ -52,4 +52,12 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+		ApiErrorResponse response = ApiErrorResponse.builder().status(HttpStatus.BAD_REQUEST.value())
+				.message(ex.getMessage()).timestamp(LocalDateTime.now()).build();
+
+		return ResponseEntity.badRequest().body(response);
+	}
 }
