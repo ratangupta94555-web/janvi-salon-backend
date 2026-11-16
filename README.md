@@ -15,14 +15,18 @@ Update these values to match your local or hosted MySQL instance.
 
 ## Gallery uploads
 
-Gallery uploads use signed Cloudinary uploads from the backend. Set these
-properties in `application.properties` before starting Spring Boot:
+Gallery uploads use signed Cloudinary uploads from the backend. Configure these
+environment variables before starting Spring Boot:
 
-- `cloudinary.cloud-name`
-- `cloudinary.api-key`
-- `cloudinary.api-secret`
-- `admin.username`
-- `admin.password`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+
+The Cloudinary API key and secret must be a matching pair from the same
+Cloudinary product environment. Keep the secret in deployment secrets or local
+environment variables; do not commit it to `application.properties`.
 
 Admin credentials are validated by the backend and establish an HTTP-only
 session. The browser does not request or store a Cloudinary secret or gallery
