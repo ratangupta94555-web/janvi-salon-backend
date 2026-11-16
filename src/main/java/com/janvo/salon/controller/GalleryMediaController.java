@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/gallery")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 public class GalleryMediaController {
 
 	private final GalleryMediaService galleryMediaService;
@@ -35,7 +33,6 @@ public class GalleryMediaController {
 	}
 
 	@PostMapping(value = "/admin/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@CrossOrigin(origins = "${app.cors.allowed-origin:http://localhost:3000}", allowCredentials = "true")
 	public ResponseEntity<?> upload(
 			@RequestHeader(value = "X-Admin-Request", required = false) String adminRequest,
 			@RequestParam(value = "images", required = false) List<MultipartFile> images,
