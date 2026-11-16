@@ -45,7 +45,7 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 	@Value("${cloudinary.api-secret:}")
 	private String apiSecret;
 
-	@Value("${gallery.admin-token:}")
+	@Value("${cloudinary.admin-token:}")
 	private String adminToken;
 
 	@Override

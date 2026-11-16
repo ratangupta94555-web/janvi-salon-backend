@@ -1,5 +1,22 @@
 # Janvi Salon Backend
 
+## Database setup
+
+The backend expects a MySQL database. Instead of hardcoding localhost settings in
+[application.properties](src/main/resources/application.properties), configure the
+connection via environment variables:
+
+```powershell
+$env:SPRING_DATASOURCE_URL = "jdbc:mysql://localhost:3306/janvisalondb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false"
+$env:SPRING_DATASOURCE_USERNAME = "root"
+$env:SPRING_DATASOURCE_PASSWORD = "root"
+```
+
+If the app is deployed to a host such as Railway, set the same variables in the
+platform environment instead of editing the file directly. The defaults in the
+application config keep the same local MySQL values if no environment variables
+are set.
+
 ## Gallery uploads
 
 Gallery uploads use signed Cloudinary uploads from the backend. The cloud name
@@ -9,7 +26,7 @@ override it, along with these environment variables, before starting Spring Boot
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
-- `GALLERY_ADMIN_TOKEN` - a separate, private token used by the admin Gallery
+- `CLOUDINARY_ADMIN_TOKEN` - a separate, private token used by the admin Gallery
   page; do not reuse the Cloudinary API secret.
 
 The Cloudinary API secret and gallery admin token must remain server-side. The
@@ -29,5 +46,5 @@ terminal used to start the backend:
 $env:CLOUDINARY_CLOUD_NAME = "your-cloud-name"
 $env:CLOUDINARY_API_KEY = "your-api-key"
 $env:CLOUDINARY_API_SECRET = "your-api-secret"
-$env:GALLERY_ADMIN_TOKEN = "a-private-admin-token"
+$env:CLOUDINARY_ADMIN_TOKEN = "a-private-admin-token"
 ```
