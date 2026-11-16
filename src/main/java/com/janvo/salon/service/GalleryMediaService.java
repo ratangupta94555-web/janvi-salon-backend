@@ -15,5 +15,7 @@ public interface GalleryMediaService {
 			List<MultipartFile> videos,
 			String category);
 
+	void delete(Long id);
+
 	boolean isCloudinaryConfigured();
 }

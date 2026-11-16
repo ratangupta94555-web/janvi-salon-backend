@@ -25,5 +25,7 @@ public interface AppointmentService {
 
 	void cancel(Long id);
 	
+	void delete(Long id);
+
 	AppointmentResponse updateStatus(Long id, AppointmentStatus status);
 }

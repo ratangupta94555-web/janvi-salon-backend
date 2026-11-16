@@ -16,6 +16,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.janvo.salon.dtos.GalleryMediaResponse;
 import com.janvo.salon.entity.GalleryMedia;
 import com.janvo.salon.enums.GalleryMediaType;
+import com.janvo.salon.exceptions.ResourceNotFoundException;
 import com.janvo.salon.repository.GalleryMediaRepository;
 import com.janvo.salon.service.GalleryMediaService;
 
@@ -89,6 +90,26 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 	@Override
 	public boolean isCloudinaryConfigured() {
 		return !isBlank(cloudName) && !isBlank(apiKey) && !isBlank(apiSecret);
+	}
+
+	@Override
+	@Transactional
+	public void delete(Long id) {
+		GalleryMedia media = galleryMediaRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Gallery media not found: " + id));
+		String resourceType = media.getMediaType() == GalleryMediaType.IMAGE ? "image" : "video";
+		try {
+			Map<?, ?> result = cloudinary.uploader().destroy(
+					media.getCloudinaryPublicId(),
+					ObjectUtils.asMap("resource_type", resourceType));
+			Object deletionResult = result.get("result");
+			if (!"ok".equals(deletionResult) && !"not found".equals(deletionResult)) {
+				throw new IllegalStateException("Cloudinary did not confirm deletion of the gallery media");
+			}
+		} catch (IOException exception) {
+			throw new IllegalStateException("Cloudinary could not delete the gallery media", exception);
+		}
+		galleryMediaRepository.delete(media);
 	}
 
 	private GalleryMediaResponse uploadOne(MultipartFile file, GalleryMediaType mediaType, String category) {

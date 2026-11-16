@@ -173,6 +173,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 		appointment.setStatus(AppointmentStatus.CANCELLED);
 	}
 	
+	@Override
+	public void delete(Long id) {
+		Appointment appointment = appointmentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Appointment not found: " + id));
+		appointmentRepository.delete(appointment);
+	}
 	
 	@Override
 	public AppointmentResponse updateStatus(Long id, AppointmentStatus status) {

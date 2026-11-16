@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,5 +67,31 @@ public class GalleryMediaController {
 		}
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(galleryMediaService.upload(images, videos, category));
+	}
+
+	@DeleteMapping("/admin/{id}")
+	public ResponseEntity<?> delete(
+			@RequestHeader(value = "X-Admin-Request", required = false) String adminRequest,
+			@PathVariable Long id,
+			HttpSession session) {
+		if (!Boolean.TRUE.equals(session.getAttribute(AdminAuthController.ADMIN_SESSION_ATTRIBUTE))) {
+			return adminError(HttpStatus.UNAUTHORIZED, "Admin sign-in is required to delete gallery media");
+		}
+		if (!"true".equals(adminRequest)) {
+			return adminError(HttpStatus.FORBIDDEN, "The gallery deletion request could not be verified");
+		}
+		if (!galleryMediaService.isCloudinaryConfigured()) {
+			return adminError(HttpStatus.SERVICE_UNAVAILABLE, "Cloudinary credentials are not configured on the server");
+		}
+		galleryMediaService.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	private ResponseEntity<ApiErrorResponse> adminError(HttpStatus status, String message) {
+		return ResponseEntity.status(status).body(ApiErrorResponse.builder()
+				.status(status.value())
+				.message(message)
+				.timestamp(java.time.LocalDateTime.now())
+				.build());
 	}
 }
