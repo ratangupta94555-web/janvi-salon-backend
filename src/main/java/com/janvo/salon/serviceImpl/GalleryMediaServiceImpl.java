@@ -1,8 +1,6 @@
 package com.janvo.salon.serviceImpl;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +43,6 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 	@Value("${cloudinary.api-secret:}")
 	private String apiSecret;
 
-	@Value("${cloudinary.admin-token:}")
-	private String adminToken;
-
 	@Override
 	@Transactional(readOnly = true)
 	public List<GalleryMediaResponse> list() {
@@ -89,18 +84,6 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 		}
 		videoFiles.forEach(video -> uploaded.add(uploadOne(video, GalleryMediaType.VIDEO, category)));
 		return uploaded;
-	}
-
-	@Override
-	public boolean isAdminTokenConfigured() {
-		return !isBlank(adminToken);
-	}
-
-	@Override
-	public boolean isValidAdminToken(String token) {
-		return !isBlank(adminToken) && !isBlank(token)
-				&& MessageDigest.isEqual(adminToken.getBytes(StandardCharsets.UTF_8),
-						token.trim().getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Override

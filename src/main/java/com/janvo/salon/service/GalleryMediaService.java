@@ -15,9 +15,5 @@ public interface GalleryMediaService {
 			List<MultipartFile> videos,
 			String category);
 
-	boolean isAdminTokenConfigured();
-
-	boolean isValidAdminToken(String token);
-
 	boolean isCloudinaryConfigured();
 }
