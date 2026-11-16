@@ -28,8 +28,9 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 
 	private static final int MAX_IMAGES = 5;
 	private static final int MAX_VIDEOS = 1;
+	private static final long MAX_TOTAL_VIDEOS = 10;
 	private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024;
-	private static final long MAX_VIDEO_BYTES = 100L * 1024 * 1024;
+	private static final long MAX_VIDEO_BYTES = 50L * 1024 * 1024;
 	private static final Set<String> CATEGORIES = Set.of("Makeup", "Hair", "Bridal", "Studio");
 
 	private final Cloudinary cloudinary;
@@ -72,6 +73,12 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 		}
 		if (videoFiles.size() > MAX_VIDEOS) {
 			throw new IllegalArgumentException("You can upload at most 1 video at a time");
+		}
+		if (!videoFiles.isEmpty()
+				&& galleryMediaRepository.countByMediaType(GalleryMediaType.VIDEO) + videoFiles.size()
+				> MAX_TOTAL_VIDEOS) {
+			throw new IllegalArgumentException(
+					"Only 10 videos can be stored in the gallery. Delete an existing video before uploading another.");
 		}
 		if (!CATEGORIES.contains(category)) {
 			throw new IllegalArgumentException("Choose a valid gallery category");
@@ -146,7 +153,7 @@ public class GalleryMediaServiceImpl implements GalleryMediaService {
 
 	private void validateVideo(MultipartFile file) {
 		if (file.getSize() > MAX_VIDEO_BYTES) {
-			throw new IllegalArgumentException("The video must be 100 MB or smaller");
+			throw new IllegalArgumentException("The video must be 50 MB or smaller");
 		}
 		if (file.getContentType() == null || !file.getContentType().toLowerCase().startsWith("video/")) {
 			throw new IllegalArgumentException("Select a valid video file");
