@@ -33,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class AppointmentServiceImpl implements AppointmentService {
 
+	private static final int APPOINTMENT_DURATION_MINUTES = 30;
+
 	private final AppointmentRepository appointmentRepository;
 	private final CustomerRepository customerRepository;
 	private final SubServiceRepository subServiceRepository;
@@ -61,7 +63,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 			throw new IllegalStateException("One or more selected services are inactive");
 		}
 
-		int totalDuration = subServices.stream().mapToInt(SubService::getDurationMinutes).sum();
+		int totalDuration = APPOINTMENT_DURATION_MINUTES;
 
 		LocalTime startTime = request.getPreferredStartTime();
 		int startMinutes = startTime.getHour() * 60 + startTime.getMinute();
