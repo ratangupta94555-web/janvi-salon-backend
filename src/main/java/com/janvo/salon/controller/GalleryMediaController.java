@@ -27,6 +27,10 @@ import lombok.RequiredArgsConstructor;
 public class GalleryMediaController {
 
 	private final GalleryMediaService galleryMediaService;
+	
+	GalleryMediaController(GalleryMediaService galleryMediaService) {
+		this.galleryMediaService=galleryMediaService;
+	}
 
 	@GetMapping
 	public ResponseEntity<List<GalleryMediaResponse>> list() {

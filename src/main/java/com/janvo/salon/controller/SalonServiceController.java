@@ -28,6 +28,10 @@ import lombok.RequiredArgsConstructor;
 public class SalonServiceController {
 
 	private final SalonServiceService service;
+	
+	SalonServiceController(SalonServiceService service){
+		this.service = service;
+	}
 
 	@PostMapping
 	public ResponseEntity<SalonServiceResponse> create(@Valid @RequestBody SalonServiceRequest request) {

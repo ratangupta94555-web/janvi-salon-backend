@@ -34,6 +34,10 @@ public class AppointmentController {
 
 	private final AppointmentService appointmentService;
 
+    AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
+
 	@PostMapping
 	public ResponseEntity<AppointmentResponse> create(@Valid @RequestBody CreateAppointmentRequest request) {
 

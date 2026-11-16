@@ -29,6 +29,10 @@ import lombok.RequiredArgsConstructor;
 public class SubServiceController {
 
     private final SubServiceService subServiceService;
+    
+    SubServiceController(SubServiceService subServiceService){
+    	this.subServiceService = subServiceService;
+    }
 
     // Create sub-service
     @PostMapping("/service/{serviceId}")
